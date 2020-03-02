@@ -1,2 +1,2 @@
-# Motion capture converter addon for Blender 2.82
+# Motion capture armature retarget addon for Blender 2.82
 
