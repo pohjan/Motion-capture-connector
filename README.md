@@ -10,6 +10,6 @@ Now it contains three bvh-hierarchy maps and few 'user maps'. They lies in Skele
 All of them is edittable eith any text editor.
 
 Simple video demo
-https://www.youtube.com/watch?v=vmEJHetT2jI
+https://youtu.be/NMs20-DGMTo 
 
 Copyright licence is CC-BY
