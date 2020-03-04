@@ -404,7 +404,10 @@ class PG_MyProperties (PropertyGroup):
         description="Apply Data to attribute.",
         items=[ ('Target-MBLab', "MB-Lab No-IK", ""),
                ('Target-Makehumancmu', "Makehuman cmu db rig", ""),
-                ('A3', "-", ""),
+               ('Target-Rigify', "Rigify", ""),
+               ('Target-User1', "Target-User1", ""),
+               ('Target-User2', "Target-User2", ""),
+               ('Target-User3', "Target-User3", ""),
                ]
         )
 
