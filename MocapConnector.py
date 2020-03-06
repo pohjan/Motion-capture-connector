@@ -1,7 +1,7 @@
 bl_info = {
     "name": "Mocap connector",
     "author": "Petri Pohjanmies",
-    "version": (0, 1),
+    "version": (0, 21),
     "blender": (2, 80, 0),
     "location": "Object data panel > Armature",
     "description": "Motion capture connection tools",
@@ -41,39 +41,42 @@ class LayoutDemoPanel(bpy.types.Panel):
 
     def draw(self, context):
         layout = self.layout
+        layout.use_property_split = True
+        layout.use_property_decorate = False
 
         scene = context.scene
         mytool = scene.my_tool
 
         type = context.active_object.type
+        
+        #way to store items in ui, not saved in .blend,,
+        #self.ownprop="Test"
 
         if type=="ARMATURE":
 
-            layout.label(text="Source armature")
+            layout.label(text="Source")
             row = layout.row()
-            row.label(text=mytool.mcrtactor)
+            row.label(text=mytool.mcrtactor,icon="ARMATURE_DATA")
             row.operator("scene.mcrtactor")
             row = layout.row()
-            row.prop(mytool,"actorskeletonmode")
+            row.prop(mytool,"actorskeletonmode",icon="OUTLINER_OB_ARMATURE")
             
+            layout.row().separator()
+            #layout.label(text="-")
             
-            layout.label(text="-")
-            
-            layout.label(text="Target armature")
+            layout.label(text="Target")
             row = layout.row()
-            row.label(text=mytool.mcrtdestination)
+            row.label(text=mytool.mcrtdestination,icon="ARMATURE_DATA")
             row.operator("scene.mcrtdestination")
             row = layout.row()
-            row.prop(mytool,"targetskeletonmode")
+            row.prop(mytool,"targetskeletonmode",icon="OUTLINER_OB_ARMATURE")
             
-            layout.label(text="-")
-            
-            layout.label(text="Actions")
+            layout.row().separator()
             row = layout.row()
             
-            row.operator("scene.mcrtmake")
+            row.operator("scene.mcrtmake", icon="LINKED")
             row = layout.row()
-            row.operator("scene.mcrtfini")
+            row.operator("scene.mcrtfini",icon="ACTION")
 
 class makeArmatureProxy(bpy.types.Operator):
     """Make armature proxy for adjust bones"""
@@ -85,7 +88,7 @@ class makeArmatureProxy(bpy.types.Operator):
         return context.active_object is not None
 
     def execute(self, context):
-        makeProxies()
+        success=makeProxies()
         return {'FINISHED'}
  
 class bakeArmatureProxy(bpy.types.Operator):
@@ -217,6 +220,8 @@ def generateProxies():
 
     pelvisbone="Hips"
 
+    if mytool.mcrtactor=="" or mytool.mcrtdestination=="":
+        return False
     sourceob=bpy.context.scene.objects[mytool.mcrtactor]
     targetob=bpy.context.scene.objects[mytool.mcrtdestination]
     
@@ -237,6 +242,8 @@ def generateProxies():
                         makeProxy(bone,sourceob,targetob,b[0],1,a[1],a[2],a[3], a[4],a[5],a[6] ,b[1],b[2],b[3], b[4],b[5],b[6])
                     else:
                         makeProxy(bone,sourceob,targetob,b[0],0,a[1],a[2],a[3], a[4],a[5],a[6] ,b[1],b[2],b[3], b[4],b[5],b[6])
+
+    return True
 
 def readSkeleton(f):
     count=0
