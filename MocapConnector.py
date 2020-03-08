@@ -88,7 +88,8 @@ class makeArmatureProxy(bpy.types.Operator):
         return context.active_object is not None
 
     def execute(self, context):
-        success=makeProxies()
+        successo=makeProxies(self,context)
+        
         return {'FINISHED'}
  
 class bakeArmatureProxy(bpy.types.Operator):
@@ -164,9 +165,9 @@ def finalise():
     killProxies()
 
 
-def makeProxies():
+def makeProxies(operator,context):
     killProxies()
-    generateProxies()
+    generateProxies(operator,context)
 
 
 def killProxies():
@@ -179,7 +180,7 @@ def killProxies():
 
 
 #Proxymaker itself
-def generateProxies():
+def generateProxies(operator,context):
     scene = bpy.context.scene
     mytool = scene.my_tool
     #Bone match list
@@ -221,7 +222,14 @@ def generateProxies():
     pelvisbone="Hips"
 
     if mytool.mcrtactor=="" or mytool.mcrtdestination=="":
-        return False
+        operator.report({'ERROR'},"Source ot target not an armature")
+        return 0
+    if not mytool.mcrtactor in bpy.context.scene.objects:
+        operator.report({'ERROR'},"Source not exits")
+        return 0
+    if not mytool.mcrtdestination in bpy.context.scene.objects:
+        operator.report({'ERROR'},"Target not exits")
+        return 0
     sourceob=bpy.context.scene.objects[mytool.mcrtactor]
     targetob=bpy.context.scene.objects[mytool.mcrtdestination]
     
@@ -243,7 +251,7 @@ def generateProxies():
                     else:
                         makeProxy(bone,sourceob,targetob,b[0],0,a[1],a[2],a[3], a[4],a[5],a[6] ,b[1],b[2],b[3], b[4],b[5],b[6])
 
-    return True
+    return sourceob
 
 def readSkeleton(f):
     count=0
