@@ -1,7 +1,7 @@
 bl_info = {
     "name": "Mocap connector",
     "author": "Petri Pohjanmies",
-    "version": (0, 21),
+    "version": (0, 22),
     "blender": (2, 80, 0),
     "location": "Object data panel > Armature",
     "description": "Motion capture connection tools",
@@ -45,14 +45,14 @@ class LayoutDemoPanel(bpy.types.Panel):
         layout.use_property_decorate = False
 
         scene = context.scene
-        mytool = scene.my_tool
+        mytool = scene.mconn
 
         type = context.active_object.type
         
         #way to store items in ui, not saved in .blend,,
         #self.ownprop="Test"
 
-        if type=="ARMATURE":
+        if type=="ARMATURE" or "mcproxy" in context.active_object:
 
             layout.label(text="Source")
             row = layout.row()
@@ -75,6 +75,12 @@ class LayoutDemoPanel(bpy.types.Panel):
             row = layout.row()
             
             row.operator("scene.mcrtmake", icon="LINKED")
+            row = layout.row()
+            row.label(text="Bake options")
+            row = layout.row()
+            row.prop(mytool,"frameskip")
+            row = layout.row()
+            row.prop(mytool,"oldaction")
             row = layout.row()
             row.operator("scene.mcrtfini",icon="ACTION")
 
@@ -117,7 +123,7 @@ class setActor(bpy.types.Operator):
 
     def execute(self, context):
         scene = context.scene
-        mytool = scene.my_tool
+        mytool = scene.mconn
         mytool.mcrtactor=context.active_object.name
         return {'FINISHED'}
 
@@ -132,7 +138,7 @@ class setDestination(bpy.types.Operator):
 
     def execute(self, context):
         scene = context.scene
-        mytool = scene.my_tool
+        mytool = scene.mconn
         mytool.mcrtdestination=context.active_object.name
         return {'FINISHED'}
 
@@ -140,17 +146,22 @@ class setDestination(bpy.types.Operator):
 
 def finalise():
     scene = bpy.context.scene
-    mytool = scene.my_tool
+    mytool = scene.mconn
+    
+    current_mode = bpy.context.object.mode
     
     myobj=bpy.context.scene.objects[mytool.mcrtdestination]
+    skip=mytool.frameskip
+    acmode=mytool.oldaction
     
+    bpy.ops.object.mode_set ( mode = "OBJECT")
     bpy.ops.object.select_all(action='DESELECT')
     
     myobj.select_set(True)
     bpy.context.view_layer.objects.active = myobj
     
     print ("Bake started - please wait")
-    current_mode = bpy.context.object.mode
+    
     bpy.ops.object.mode_set ( mode = "POSE")
     
     bpy.ops.pose.select_all(action='SELECT')
@@ -158,7 +169,7 @@ def finalise():
     start=bpy.context.scene.frame_start
     end=bpy.context.scene.frame_end
     
-    bpy.ops.nla.bake(frame_start=start, frame_end=end, visual_keying=True, clear_constraints=True, bake_types={'POSE'})
+    bpy.ops.nla.bake(frame_start=start, frame_end=end, visual_keying=True, step=skip, use_current_action=acmode, clear_constraints=True, bake_types={'POSE'})
     
     bpy.ops.object.mode_set ( mode = current_mode)
     print ("Bake ready")
@@ -174,7 +185,7 @@ def killProxies():
     bpy.ops.object.mode_set ( mode = "OBJECT")
     bpy.ops.object.select_all(action='DESELECT')
     for ob in bpy.data.objects:
-        if ob.name[0:5]=="Proxy":
+        if "mcproxy" in ob:
             ob.select_set(True)
     bpy.ops.object.delete()
 
@@ -182,7 +193,7 @@ def killProxies():
 #Proxymaker itself
 def generateProxies(operator,context):
     scene = bpy.context.scene
-    mytool = scene.my_tool
+    mytool = scene.mconn
     #Bone match list
 
     bones={ "Hips"   :"pelvis",
@@ -285,10 +296,11 @@ def makeProxy( bone,arma,targetob,destname,locrot ,srx,sry,srz ,sox,soy,soz ,drx
     
     #Generate actor proxy
     
-    ob=bpy.data.objects.new("Proxy",None)
+    ob=bpy.data.objects.new("Joint-"+destname,None)
     bpy.context.scene.collection.objects.link ( ob )
     ob.empty_display_size=.02
     ob.empty_display_type="SPHERE"
+    ob["mcproxy"]=True
     
 
     loc=arma.location+bone.head
@@ -305,10 +317,11 @@ def makeProxy( bone,arma,targetob,destname,locrot ,srx,sry,srz ,sox,soy,soz ,drx
         print ("Bone",destname,"not exists in armature")
         return
     
-    ob2=bpy.data.objects.new("Proxy-"+destname,None)    
+    ob2=bpy.data.objects.new("Tweak-"+destname,None)    
     bpy.context.scene.collection.objects.link ( ob2 )
     ob2.empty_display_size=.26
     ob2.empty_display_type="SINGLE_ARROW"
+    ob2["mcproxy"]=True
     
     loct=targetob.location+targetbone.head
     
@@ -345,7 +358,7 @@ def getBoneByName(ob,name):
     cbone=0
     carma=0
     scene = bpy.context.scene
-    mytool = scene.my_tool
+    mytool = scene.mconn
     
     if ob.type=="ARMATURE":
         for bone in ob.pose.bones:
@@ -358,18 +371,18 @@ def getBoneByName(ob,name):
 
 class PG_MyProperties (PropertyGroup):
 
-    my_bool : BoolProperty(
-        name="Enable or Disable",
-        description="A bool property",
+    oldaction : BoolProperty(
+        name="Overwrite existing action",
+        description="If not selected then new action appears",
         default = False
         )
 
-    my_int : IntProperty(
-        name = "Int Value",
-        description="A integer property",
-        default = 23,
-        min = 10,
-        max = 100
+    frameskip : IntProperty(
+        name = "Skipping frames",
+        description="Number of skipped frames",
+        default = 1,
+        min = 1,
+        max = 10
         )
 
     my_float : FloatProperty(
@@ -442,7 +455,7 @@ def register():
     bpy.utils.register_class(setActor)
     bpy.utils.register_class(setDestination)
     #bpy.utils.register_class(actorProps)
-    bpy.types.Scene.my_tool = PointerProperty(type=PG_MyProperties)
+    bpy.types.Scene.mconn = PointerProperty(type=PG_MyProperties)
 
 def unregister():
     for cls in reversed(classes):
@@ -454,7 +467,7 @@ def unregister():
     bpy.utils.unregister_class(setActor)
     bpy.utils.unregister_class(setDestination)
     #bpy.utils.unregister_class(actorProps)
-    del bpy.types.Scene.my_tool  # remove PG_MyProperties 
+    del bpy.types.Scene.mconn  # remove PG_MyProperties 
 
 if __name__ == "__main__":
     register()
