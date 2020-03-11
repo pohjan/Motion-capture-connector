@@ -9,11 +9,6 @@ Workflow is quite simple, just load your BVH File with regular Blenders import t
 Now it contains three bvh-hierarchy maps and few 'user maps'. They lies in Skeleton drawer in same location of the addon itself.
 All of them is edittable with any text editor.
 
-*changelog 0.22 version
-*Fix crash if you try bake in pose mode
-*Ability to skip n frames on bake
-*Better 'proxy' identification
-
 Simple video demo
 https://youtu.be/NMs20-DGMTo 
 
