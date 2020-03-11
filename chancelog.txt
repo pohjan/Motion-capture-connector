@@ -3,7 +3,8 @@
 
 0.22
 
--Fix crash if try bake in påose mode
+-Fix crash in bake when mode pose selected
 -Ability to skip frames in bake
 -Ability bake new or existing action
--Identify proxies by property name
+-Identify proxies by property name not object name :(
+
