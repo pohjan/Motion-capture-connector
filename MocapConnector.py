@@ -1,12 +1,12 @@
 bl_info = {
     "name": "Mocap connector",
     "author": "Petri Pohjanmies",
-    "version": (0, 22),
+    "version": (0, 23),
     "blender": (2, 80, 0),
     "location": "Object data panel > Armature",
     "description": "Motion capture connection tools",
     "warning": "",
-    "wiki_url": "",
+    "wiki_url": "https://github.com/pohjan/Motion-capture-connector/wiki",
     "category": "Animation",
 }
 
@@ -74,7 +74,18 @@ class LayoutDemoPanel(bpy.types.Panel):
             layout.row().separator()
             row = layout.row()
             
+            layout.row().separator()
             row.operator("scene.mcrtmake", icon="LINKED")
+            
+            layout.label(text="Tweak options")
+            
+            row = layout.row()
+            row.prop(mytool,"ilocpelvis")
+            row = layout.row()
+            row.prop(mytool,"irotshoulders")
+            
+            layout.row().separator()
+            
             row = layout.row()
             row.label(text="Bake options")
             row = layout.row()
@@ -82,7 +93,9 @@ class LayoutDemoPanel(bpy.types.Panel):
             row = layout.row()
             row.prop(mytool,"oldaction")
             row = layout.row()
-            row.operator("scene.mcrtfini",icon="ACTION")
+            dou=row.operator("scene.mcrtfini",icon="ACTION")
+            if "Joint-Pelvis" not in bpy.data.objects:
+                row.enabled=False
 
 class makeArmatureProxy(bpy.types.Operator):
     """Make armature proxy for adjust bones"""
@@ -95,6 +108,7 @@ class makeArmatureProxy(bpy.types.Operator):
 
     def execute(self, context):
         successo=makeProxies(self,context)
+        updateConstraints(self, context)
         
         return {'FINISHED'}
  
@@ -245,6 +259,7 @@ def generateProxies(operator,context):
     targetob=bpy.context.scene.objects[mytool.mcrtdestination]
     
     if sourceob.type=="ARMATURE":
+        targetob["mcstructure"]=targetbones
         for bone in sourceob.pose.bones:
             found=0
             for sbone in sourcebones:
@@ -258,9 +273,11 @@ def generateProxies(operator,context):
                 if b[0]!="<null>":
                     print (bone.name,"found in key",found,"/",b[0])
                     if bone.name==pelvisbone:
-                        makeProxy(bone,sourceob,targetob,b[0],1,a[1],a[2],a[3], a[4],a[5],a[6] ,b[1],b[2],b[3], b[4],b[5],b[6])
+                        makeProxy(bone,sourceob,targetob,b[0],found,1,a[1],a[2],a[3], a[4],a[5],a[6] ,b[1],b[2],b[3], b[4],b[5],b[6])
+                        #targetob["mcpelvisbone"]=b[0]
+                        print (targetob)
                     else:
-                        makeProxy(bone,sourceob,targetob,b[0],0,a[1],a[2],a[3], a[4],a[5],a[6] ,b[1],b[2],b[3], b[4],b[5],b[6])
+                        makeProxy(bone,sourceob,targetob,b[0],found,0,a[1],a[2],a[3], a[4],a[5],a[6] ,b[1],b[2],b[3], b[4],b[5],b[6])
 
     return sourceob
 
@@ -290,13 +307,13 @@ def readSkeleton(f):
     return skeleton
 
 
-def makeProxy( bone,arma,targetob,destname,locrot ,srx,sry,srz ,sox,soy,soz ,drx,dry,drz ,dox,doy,doz ):
+def makeProxy( bone,arma,targetob,destname,keyname, locrot ,srx,sry,srz ,sox,soy,soz ,drx,dry,drz ,dox,doy,doz ):
     
     bonename=bone.name
     
     #Generate actor proxy
     
-    ob=bpy.data.objects.new("Joint-"+destname,None)
+    ob=bpy.data.objects.new("Joint-"+keyname,None)
     bpy.context.scene.collection.objects.link ( ob )
     ob.empty_display_size=.02
     ob.empty_display_type="SPHERE"
@@ -309,7 +326,7 @@ def makeProxy( bone,arma,targetob,destname,locrot ,srx,sry,srz ,sox,soy,soz ,drx
     con=ob.constraints.new("COPY_TRANSFORMS")
     con.target=arma
     con.subtarget=bone.name
-    
+    con.name = "MCAP Transforms"
     #Generate rotation proxy
     
     targetbone=getBoneByName(targetob,destname)
@@ -317,7 +334,7 @@ def makeProxy( bone,arma,targetob,destname,locrot ,srx,sry,srz ,sox,soy,soz ,drx
         print ("Bone",destname,"not exists in armature")
         return
     
-    ob2=bpy.data.objects.new("Tweak-"+destname,None)    
+    ob2=bpy.data.objects.new("Tweak-"+keyname,None)    
     bpy.context.scene.collection.objects.link ( ob2 )
     ob2.empty_display_size=.26
     ob2.empty_display_type="SINGLE_ARROW"
@@ -347,11 +364,13 @@ def makeProxy( bone,arma,targetob,destname,locrot ,srx,sry,srz ,sox,soy,soz ,drx
     for con in targetbone.constraints:
         targetbone.constraints.remove(con)
     tarcon=targetbone.constraints.new("COPY_ROTATION")
+    tarcon.name = "MCAP Rotations"
     tarcon.target=ob2
     
     if locrot==1:
         print ("locrot")
         tarcon=targetbone.constraints.new("COPY_LOCATION")
+        tarcon.name = "MCAP Location"
         tarcon.target=ob2
     
 def getBoneByName(ob,name):
@@ -368,6 +387,30 @@ def getBoneByName(ob,name):
                 print ("Target exists:"+cbone.name)
     return cbone
     
+def updateConstraints(self,context):
+    scene = bpy.context.scene
+    mytool = scene.mconn
+    
+    ob=bpy.context.scene.objects[mytool.mcrtdestination]
+    #bone=ob.pose.bones[ob["mcpelvisbone"]]
+    
+    bonelist=ob["mcstructure"]
+    
+    #Pelvis location i
+    bone=ob.pose.bones[bonelist["Pelvis"][0]]
+    con=bone.constraints["MCAP Location"]
+    con.influence=mytool.ilocpelvis
+    
+    #Shoulders rotation i
+    bone=ob.pose.bones[bonelist["LShoulder"][0]]
+    con=bone.constraints["MCAP Rotations"]
+    con.influence=mytool.irotshoulders
+    bone=ob.pose.bones[bonelist["RShoulder"][0]]
+    con=bone.constraints["MCAP Rotations"]
+    con.influence=mytool.irotshoulders
+    
+    return None
+
 
 class PG_MyProperties (PropertyGroup):
 
@@ -383,6 +426,24 @@ class PG_MyProperties (PropertyGroup):
         default = 1,
         min = 1,
         max = 10
+        )
+    
+    ilocpelvis : FloatProperty(
+        name = "Pelvis location influence",
+        description="Influence of pelvis location",
+        default = 1,
+        update = updateConstraints,
+        min = 0,
+        max = 1
+        )
+    
+    irotshoulders : FloatProperty(
+        name = "Shoulders rotation influence",
+        description="Influence of pelvis location",
+        default = 1,
+        update = updateConstraints,
+        min = 0,
+        max = 1
         )
 
     my_float : FloatProperty(
