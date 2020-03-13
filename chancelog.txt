@@ -8,3 +8,10 @@
 -Ability bake new or existing action
 -Identify proxies by property name not object name :(
 
+0.23
+
+Influence tweaks are basically shortcuts to bone consrtaints, but these are most using ones.
+-Tweak options: Influence of pelvis location and influence of shoulders rotations
+-Code cleanup
+-Ui crayouts when not possible
+-Keep toolpanel open when tweaker proxy selected
