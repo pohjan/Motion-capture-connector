@@ -108,7 +108,8 @@ class makeArmatureProxy(bpy.types.Operator):
 
     def execute(self, context):
         successo=makeProxies(self,context)
-        updateConstraints(self, context)
+        if successo==1:
+            updateConstraints(self, context)
         
         return {'FINISHED'}
  
@@ -279,7 +280,7 @@ def generateProxies(operator,context):
                     else:
                         makeProxy(bone,sourceob,targetob,b[0],found,0,a[1],a[2],a[3], a[4],a[5],a[6] ,b[1],b[2],b[3], b[4],b[5],b[6])
 
-    return sourceob
+    return 1
 
 def readSkeleton(f):
     count=0
@@ -434,7 +435,8 @@ class PG_MyProperties (PropertyGroup):
         default = 1,
         update = updateConstraints,
         min = 0,
-        max = 1
+        max = 1,
+        step = .5
         )
     
     irotshoulders : FloatProperty(
@@ -443,7 +445,8 @@ class PG_MyProperties (PropertyGroup):
         default = 1,
         update = updateConstraints,
         min = 0,
-        max = 1
+        max = 1,
+        step = .5
         )
 
     my_float : FloatProperty(

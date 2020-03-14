@@ -1,16 +1,16 @@
 Name:MB-Lab
 
 #Pelvis
-@Pelvis,pelvis,-60,0,0,0,0.08,-0.10
+@Pelvis,pelvis,-50,0,0,0,0.08,-0.10
 
 #Spine parts
 @Spine0,<null>,0,0,0,0,0,0
-@Spine1,spine01,0,0,0,0,0,0
+@Spine1,spine01,-10,0,0,0,0,0
 @Spine2,spine02,0,0,0,0,0,0
 @Spine3,spine03,0,0,0,0,0,0
 @Spine4,<null>,0,0,0,0,0,0
 
-@Neck,neck,0,0,0,0,0,0
+@Neck,neck,8,0,0,0,0,0
 @Head,head,0,0,0,0,0,0
 
 
@@ -28,8 +28,8 @@ Name:MB-Lab
 @RToe,toes_R,0,0,0,0,0,0
 
 #Hands
-@LShoulder,clavicle_L,0,0,0,0,0,0
-@RShoulder,clavicle_R,0,0,0,0,0,0
+@LShoulder,clavicle_L,10,0,0,0,0,0
+@RShoulder,clavicle_R,-10,0,0,0,0,0
 
 @LArm,upperarm_L,0,0,0,0,0,0
 @RArm,upperarm_R,0,0,0,0,0,0
@@ -37,7 +37,7 @@ Name:MB-Lab
 @LForeArm,lowerarm_L,0,0,0,0,0,0
 @RForeArm,lowerarm_R,0,0,0,0,0,0
 
-@LHand,hand_L,0,0,0,0,0,0
-@RHand,hand_R,0,0,0,0,0,0
+@LHand,hand_L,0,90,0,0,0,0
+@RHand,hand_R,0,-90,0,0,0,0
 
 
