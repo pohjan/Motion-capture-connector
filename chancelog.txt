@@ -15,3 +15,5 @@ Influence tweaks are basically shortcuts to bone consrtaints, but these are most
 -Code cleanup
 -Ui crayouts when not possible
 -Keep toolpanel open when tweaker proxy selected
+-MH-Lab skeleton axis tweak
+
