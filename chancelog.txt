@@ -17,3 +17,8 @@ Influence tweaks are basically shortcuts to bone consrtaints, but these are most
 -Keep toolpanel open when tweaker proxy selected
 -MH-Lab skeleton axis tweak
 
+0.24
+
+Influence tweak for neck (They can be too wobbly on my test bvh)
+Missing spine bone in 3-spinebone source skeleton
+Better MH-Lab axis
