@@ -83,6 +83,8 @@ class LayoutDemoPanel(bpy.types.Panel):
             row.prop(mytool,"ilocpelvis")
             row = layout.row()
             row.prop(mytool,"irotshoulders")
+            row = layout.row()
+            row.prop(mytool,"irotneck")
             
             layout.row().separator()
             
@@ -410,6 +412,11 @@ def updateConstraints(self,context):
     con=bone.constraints["MCAP Rotations"]
     con.influence=mytool.irotshoulders
     
+    #Neck rotation i
+    bone=ob.pose.bones[bonelist["Neck"][0]]
+    con=bone.constraints["MCAP Rotations"]
+    con.influence=mytool.irotneck
+    
     return None
 
 
@@ -441,13 +448,23 @@ class PG_MyProperties (PropertyGroup):
     
     irotshoulders : FloatProperty(
         name = "Shoulders rotation influence",
-        description="Influence of pelvis location",
+        description="Influence of shoulders rotation",
         default = 1,
         update = updateConstraints,
         min = 0,
         max = 1,
         step = .5
         )
+    irotneck : FloatProperty(
+        name = "Neck rotation influence",
+        description="Influence of neck rotation",
+        default = 1,
+        update = updateConstraints,
+        min = 0,
+        max = 1,
+        step = .5
+        )
+    
 
     my_float : FloatProperty(
         name = "Float Value",

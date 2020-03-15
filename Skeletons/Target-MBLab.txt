@@ -7,7 +7,7 @@ Name:MB-Lab
 @Spine0,<null>,0,0,0,0,0,0
 @Spine1,spine01,-10,0,0,0,0,0
 @Spine2,spine02,0,0,0,0,0,0
-@Spine3,spine03,0,0,0,0,0,0
+@Spine3,spine03,-15,0,0,0,0,0
 @Spine4,<null>,0,0,0,0,0,0
 
 @Neck,neck,8,0,0,0,0,0

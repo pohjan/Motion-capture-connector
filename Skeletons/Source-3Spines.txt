@@ -6,7 +6,7 @@ Name:3-Spinebones
 #Spine parts
 @Spine0,<null>,0,0,0,0,0,0
 @Spine1,ToSpine,0,0,0,0,0,0
-@Spine2,<null>,0,0,0,0,0,0
+@Spine2,Spine,0,0,0,0,0,0
 @Spine3,Spine1,0,0,0,0,0,0
 @Spine4,<null>,0,0,0,0,0,0
 
