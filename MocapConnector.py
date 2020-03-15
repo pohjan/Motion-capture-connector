@@ -1,7 +1,7 @@
 bl_info = {
     "name": "Mocap connector",
     "author": "Petri Pohjanmies",
-    "version": (0, 23),
+    "version": (0, 24),
     "blender": (2, 80, 0),
     "location": "Object data panel > Armature",
     "description": "Motion capture connection tools",
