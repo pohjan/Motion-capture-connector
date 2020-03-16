@@ -22,3 +22,8 @@ Influence tweaks are basically shortcuts to bone consrtaints, but these are most
 Influence tweak for neck (They can be too wobbly on my test bvh)
 Missing spine bone in 3-spinebone source skeleton
 Better MH-Lab axis
+
+0.25
+
+Split pelvis location influence to horizontal (xy) and vertical (z) constraints
+
