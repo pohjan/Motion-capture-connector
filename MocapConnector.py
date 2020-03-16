@@ -82,6 +82,8 @@ class LayoutDemoPanel(bpy.types.Panel):
             row = layout.row()
             row.prop(mytool,"ilocpelvis")
             row = layout.row()
+            row.prop(mytool,"ilocpelvisz")
+            row = layout.row()
             row.prop(mytool,"irotshoulders")
             row = layout.row()
             row.prop(mytool,"irotneck")
@@ -373,8 +375,15 @@ def makeProxy( bone,arma,targetob,destname,keyname, locrot ,srx,sry,srz ,sox,soy
     if locrot==1:
         print ("locrot")
         tarcon=targetbone.constraints.new("COPY_LOCATION")
-        tarcon.name = "MCAP Location"
-        tarcon.target=ob2
+        tarcon.name = "MCAP LocationH"
+        tarcon.target = ob2
+        tarcon.use_z = False
+        
+        tarcon=targetbone.constraints.new("COPY_LOCATION")
+        tarcon.name = "MCAP LocationV"
+        tarcon.target = ob2
+        tarcon.use_x = False
+        tarcon.use_y = False
     
 def getBoneByName(ob,name):
     cbone=0
@@ -399,10 +408,15 @@ def updateConstraints(self,context):
     
     bonelist=ob["mcstructure"]
     
-    #Pelvis location i
+    #Pelvis location ixy
     bone=ob.pose.bones[bonelist["Pelvis"][0]]
-    con=bone.constraints["MCAP Location"]
+    con=bone.constraints["MCAP LocationH"]
     con.influence=mytool.ilocpelvis
+    
+    #Pelvis location iz
+    bone=ob.pose.bones[bonelist["Pelvis"][0]]
+    con=bone.constraints["MCAP LocationV"]
+    con.influence=mytool.ilocpelvisz
     
     #Shoulders rotation i
     bone=ob.pose.bones[bonelist["LShoulder"][0]]
@@ -437,8 +451,17 @@ class PG_MyProperties (PropertyGroup):
         )
     
     ilocpelvis : FloatProperty(
-        name = "Pelvis location influence",
-        description="Influence of pelvis location",
+        name = "Pelvis horizontal influence",
+        description="Influence of pelvis XY location",
+        default = 1,
+        update = updateConstraints,
+        min = 0,
+        max = 1,
+        step = .5
+        )
+    ilocpelvisz : FloatProperty(
+        name = "Pelvis vertical influence",
+        description="Influence of pelvis Z location",
         default = 1,
         update = updateConstraints,
         min = 0,
