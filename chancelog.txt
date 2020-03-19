@@ -25,5 +25,6 @@ Better MH-Lab axis
 
 0.25
 
-Split pelvis location influence to horizontal (xy) and vertical (z) constraints
+-Split pelvis location influence to horizontal (xy) and vertical (z) constraints
+-pep cleanup
 
