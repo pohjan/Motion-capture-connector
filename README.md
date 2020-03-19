@@ -1,15 +1,17 @@
 # Motion capture armature retarget addon for Blender 2.82
 
-It is very early stage and can map BVH:s to MB-Lab or Makehuman CMU Rigs skeletons only. 
+Due to the lack of BVH retargetting tools in Blender 2.8, I’ve written a few script for my personal use. Now I decided to release it as a Blender 2.8 extension for the others.
 
-Later we can produce more skeleton maps, and maybe some interactive way to connect bone manually.
+It’s still in the early stages, but it works fine with the following limitations.
 
-Workflow is quite simple, just load your BVH File with regular Blenders import tool. Scale it to match your armature. Attach imported object to source armature and your MB-Lab armature to the target armature. Tweak bone proxies if needed. Bake proxy to action.
+It can retarget BVH animation to MB-Lab basic/muscular armatures, Makehuman cmudb rigs and partial Rigify FK.
 
-Now it contains three bvh-hierarchy maps and few 'user maps'. They lies in Skeleton drawer in same location of the addon itself.
-All of them is edittable with any text editor.
+For installation just download and install MocapConnerctor.zip in Blender preferences.
 
 Simple video demo
 https://youtu.be/NMs20-DGMTo 
+
+Make walk cycle sequence (4 min tutorial)
+https://www.youtube.com/watch?v=eSrEbEllQDI
 
 Copyright licence is CC-BY
